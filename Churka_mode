@@ -1,0 +1,136 @@
+import telebot
+from random import randint
+from telebot import types
+import time
+
+# переменная, где будем хранить токен
+bot_token = '6981752074:AAH6eck-bTw-ligwidEdTcDSZYDdSclW2N0'
+# создаем экземпляр бота
+bot = telebot.TeleBot(token=bot_token)
+
+# характеристики нашего питомца
+name='' # имя питомца
+energy = 100 # показатель энергии
+satiety = 100 # показатель сытости
+happiness = 100 # показатель счастья
+
+# функция-покормить питомца
+def feed():
+    global satiety, energy, happiness
+    satiety += 10
+    energy += 5
+    happiness += 10
+
+# функция-поиграть с питомцем
+def play():
+    global happiness, energy, satiety
+    happiness += 15
+    energy -= 10
+    satiety -= 7
+
+# функция-дать питомцу поспать
+def sleep():
+    global energy, happiness, satiety
+    energy += 50
+    happiness -= 10
+    satiety -= 15
+# контент
+pica_sleep_gif='C:\\Users\\ivans\\PycharmProjects\\мастеркласс_проб\\пикачу\\пикачу_спит_гиф\\'
+pica_feed_pic='C:\\Users\\ivans\\PycharmProjects\\мастеркласс_проб\\пикачу\\пикачу ест\\'
+pica_zvyk='C:\\Users\\ivans\\PycharmProjects\\мастеркласс_проб\\пикачу\\пика_звуки\\'
+pica_feed_gif='C:\\Users\\ivans\\PycharmProjects\\мастеркласс_проб\\пикачу\\пикачу ест гифки\\'
+pica_negative='C:\\Users\\ivans\\PycharmProjects\\мастеркласс_проб\\пикачу\\пика_недаволен_гиф\\'
+pica_rad='C:\\Users\\ivans\\PycharmProjects\\мастеркласс_проб\\пикачу\\пика_даволен_гиф\\'
+#без рандома одна гифка или картинка
+pica_rest='C:\\Users\\ivans\\PycharmProjects\\мастеркласс_проб\\пикачу\\пика_недаволен_гиф\\пикачу_больше_не_может_спать.gif'
+start_pic='C:\\Users\\ivans\\PycharmProjects\\мастеркласс_проб\\пикачу\\привет_пик.jpg'
+# функция проверки состояния пикачу
+def check(message):
+    global energy, hapinness, satiety
+    id = message.chat.id
+    if satiety < 0:
+        bot.send_message(id, f"Пика! Пика! Пикачу сейчас умрет от голода 🍽 !")
+        return
+    elif satiety > 150:
+        bot.send_message(id, "Пика! Пика! Пикачу сейчас умрет от переедания 🍽 !")
+        return
+    if happiness < 0:
+        bot.send_message(id, "Пика! Пика! Пикачу сейчас умрет от депрессии 😫!")
+        return
+    if energy < 0:
+        bot.send_message(id, "Пика! Пика! Пикачу сейчас умрет от нехватки энергии ⚡️ !")
+        return
+    elif energy > 150:
+        bot.send_message(id, "Пика! Пика! Пикачу сейчас умрет от переизбытка энергии ⚡️ !")
+        return
+@bot.message_handler(commands=['start'])
+def startFunc(message):
+    bot.send_message(message.chat.id, f"Пика! Пика! Привет, {message.from_user.first_name} ! Здесь живёт Пикачу,который требует уход за собой!\n"
+"Вот команды, чтобы с ним всё было хорошо :\n/pica - поухаживать за своим пикачу \n/stats-посмотреть состояние своего пикачу")
+
+@bot.message_handler(commands=['pica'])
+def pica(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True,one_time_keyboard=True)
+    item_1 = types.KeyboardButton('🍽')
+    item_2 = types.KeyboardButton('🧩')
+    item_3 = types.KeyboardButton('💤')
+    item_4 = types.KeyboardButton('stats')
+    item_5 = types.KeyboardButton('hapinnes')
+    item_6 = types.KeyboardButton('story')
+    markup.add(item_1, item_2, item_3,item_4,item_5,item_6)
+    bot.send_message(message.chat.id,'Что ты хочешь сделать со своим пикачу? Выбери кнопку!',reply_markup=markup)
+
+@bot.message_handler(commands=['stats'])
+def statsFunc(message):
+    global name, satiety, happiness, energy
+    bot.send_message(message.chat.id, f"Энергия ⚡️: {energy}\nСытость 🍽: {satiety}\nРадость 🥳: {happiness}")
+
+@bot.message_handler(commands=['hapinnes'])
+def hapinnes(message):
+    global name, happiness
+    if happiness <=10:
+        bot.send_message(message.chat.id,f'😭')
+    elif happiness >= 20:
+        bot.send_message(message.chat.id,f'😂')
+    elif happiness == 100:
+        bot.send_message(message.chat.id,f'🤩')
+@bot.message_handler(commands=['story'])
+def story(message):
+    bot.send_message(message.chat.id,'Странник ты выбрал сюжет делай правильный выбор, чтобы выййграть приз')
+    bot.send_message(message.chat.id,'Налево пойдёшь в горы войдёшь, направо пойдёшь в лес попадёшь, а прямо пойдёшь в полях окажешься')
+    if message.text == 'налево':
+        bot.reply_to(message.chat.id,f'Ваш {name} сорвался с обрыва')
+    elif message.text == 'направо':
+        bot.reply_to(message.chat.id,f'Ваш {name} заблудился и умер от голода')
+    elif message.text == 'прямо':
+        bot.reply_to(message.chat.id,f'Ваш {name} бес проблем дошёл до следующего выбора')
+        bot.send_message(message.chat.id,'Вы оказались перед табличкой : до города осталось пройти 1 локации. На лево пойдёшь коня потеряешь, прямо нигерс, направо поёдешь  города дойдёшь')
+    if message.text == 'лево':
+        bot.reply_to(message.chat.id, f'Ваш {name} dc')
+    elif message.text == 'право':
+        bot.reply_to(message.chat.id, f'Ваш {name} победил')
+    elif message.text == 'напрямо':
+        bot.reply_to(message.chat.id, f'Ваш {name} xddvd')
+        bot.send_message(message.chat.id,'Вы дошли до города')
+
+
+@bot.message_handler(commands=['text'])
+def feedFunc(message):
+    global name, satiety, happiness, energy
+    if message.text=='🍽':
+        feed()
+        bot.send_message(message.chat.id, f"Ваш {name} плотно покушал, и его показатель сытости теперь {satiety};\nЭнергия ⚡️ +5\nСытость 🍽 +10\nРадость 🥳 +10")
+        check(message)
+    elif message.text=='🧩':
+        play()
+        bot.send_message(message.chat.id,f"Ваш {name} хорошо поиграл, и его показатель счастья теперь {happiness};\nЭнергия ⚡️ -10\nСытость 🍽 -7\nРадость 🥳 +15")
+        check(message)
+    elif message.text=='💤':
+        sleep()
+        bot.send_message(message.chat.id,f"Ваш {name} сладко поспал, и его показатель энергии = {energy};\nЭнергия ⚡️ +50\nСытость 🍽 -15\nРадость 🥳 -10")
+        check(message)
+    # else:
+    #     bot.send_message(message.chat.id, "Странное сообщение")
+
+
+bot.infinity_polling()
